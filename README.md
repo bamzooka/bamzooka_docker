@@ -2,8 +2,7 @@
 
 - [Docker](https://docker.com/) is an open source project to pack, ship and run any Linux application in a lighter weight, faster container than a traditional virtual machine.
 
-- Docker makes it much easier to deploy [a Bamzooka forum](https://github.com/bamzooka/bamzooka) on your servers and keep it updated. For background, see [Sam's blog post](http://samsaffron.com/archive/2013/11/07/bamzooka-in-a-docker-container).
-
+- Docker makes it much easier to deploy [a Bamzooka](https://github.com/bamzooka/bamzooka) on your servers and keep it updated. 
 - The templates and base image configure Bamzooka with the Bamzooka team's recommended optimal defaults.
 
 ### Getting Started
@@ -192,12 +191,9 @@ installs you can ensure they are in sync by looking at `/etc/passwd` and
 `/etc/group`, the Bamzooka account will have UID 1000.
 
 
-### Advanced topics
+### Credits
 
-- [Setting up SSL with Bamzooka Docker](https://meta.bamzooka.org/t/allowing-ssl-for-your-bamzooka-docker-setup/13847)
-- [Multisite configuration with Docker](https://meta.bamzooka.org/t/multisite-configuration-with-docker/14084)
-- [Linking containers for a multiple container setup](https://meta.bamzooka.org/t/linking-containers-for-a-multiple-container-setup/20867)
-- [Using Rubygems mirror to improve connection problem in China](https://meta.bamzooka.org/t/replace-rubygems-org-with-taobao-mirror-to-resolve-network-error-in-china/21988/1)
+This was originally copied from [Discourse_docker](https://github.com/discourse/docker_manager) project and modified for Bamzooka needs.
 
 License
 ===
