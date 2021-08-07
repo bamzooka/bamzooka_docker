@@ -1,0 +1,53 @@
+## this is the incoming mail receiver container template
+##
+## After making changes to this file, you MUST rebuild
+## /var/bamzooka/launcher rebuild mail-receiver
+##
+## BE *VERY* CAREFUL WHEN EDITING!
+## YAML FILES ARE SUPER SUPER SENSITIVE TO MISTAKES IN WHITESPACE OR ALIGNMENT!
+## visit http://www.yamllint.com/ to validate this file as needed
+
+base_image: bamzooka/mail-receiver:release
+update_pups: false
+
+expose:
+  - "25:25"   # SMTP
+
+env:
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+  LANGUAGE: en_US.UTF-8
+
+  ## Where e-mail to your forum should be sent.  In general, it's perfectly fine
+  ## to use the same domain as the forum itself here.
+  MAIL_DOMAIN: bamzooka.example.com
+# uncomment these (and the volume below!) to support TLS 
+#  POSTCONF_smtpd_tls_key_file:  /letsencrypt/bamzooka.example.com/prop.ltcmp.net.key
+#  POSTCONF_smtpd_tls_cert_file:  /letsencrypt/bamzooka.example.com/fullchain.cer
+#  POSTCONF_smtpd_tls_security_level: may
+
+
+  ## The URL of the mail processing endpoint of your Bamzooka forum.
+  ## This is simply your forum's base URL, with `/admin/email/handle_mail`
+  ## appended.  Be careful if you're running a subfolder setup -- in that case,
+  ## the URL needs to have the subfolder included!
+  BAMZOOKA_MAIL_ENDPOINT: 'https://bamzooka.example.com/admin/email/handle_mail'
+
+  ## The master API key of your Bamzooka forum.  You can get this from
+  ## the "API" tab of your admin panel.
+  BAMZOOKA_API_KEY: abcdefghijklmnop
+
+  ## The username to use for processing incoming e-mail.  Unless you have
+  ## renamed the `system` user, you should leave this as-is.
+  BAMZOOKA_API_USERNAME: system
+
+volumes:
+  - volume:
+      host: /var/bamzooka/shared/mail-receiver/postfix-spool
+      guest: /var/spool/postfix
+# uncomment to support TLS
+#  - volume:
+#      host: /var/bamzooka/shared/standalone/letsencrypt
+#      guest: /letsencrypt
+
+ 

@@ -1,0 +1,25 @@
+# This template adds the 'tiny_tds' gem for import scripts depending on it
+
+params:
+  home: /var/www/bamzooka
+
+hooks:
+  after_web_config:
+    - exec:
+        cd: /tmp
+        cmd:
+          - wget -O freetds.tar.gz http://www.freetds.org/files/stable/freetds-1.00.91.tar.gz
+          - tar -xzf freetds.tar.gz
+    - exec:
+        cd: /tmp/freetds-*
+        cmd:
+          - ./configure --prefix=/usr/local --with-tdsver=7.3
+          - make && make install
+
+  after_bundle_exec:
+    - exec:
+        cd: $home
+        cmd:
+          - echo "gem 'tiny_tds'" >> Gemfile
+          - su bamzooka -c 'bundle config unset deployment'
+          - su bamzooka -c 'bundle install --no-deployment --path vendor/bundle --jobs 4 --without test development'
