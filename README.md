@@ -193,7 +193,7 @@ installs you can ensure they are in sync by looking at `/etc/passwd` and
 
 ### Credits
 
-This was originally copied from [Discourse_docker](https://github.com/discourse/docker_manager) project and modified for Bamzooka needs.
+This was originally copied from [Discourse_docker](https://github.com/discourse/discourse_docker) project and modified for Bamzooka needs.
 
 License
 ===
