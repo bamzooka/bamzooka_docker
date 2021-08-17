@@ -94,7 +94,7 @@ config_file=containers/"$config".yml
 cidbootstrap=cids/"$config"_bootstrap.cid
 local_bamzooka=local_bamzooka
 
-image="f2a794462b9a"
+image="bamzooka/bamzooka"
 docker_path=`which docker.io 2> /dev/null || which docker`
 git_path=`which git`
 
