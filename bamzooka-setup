@@ -450,7 +450,7 @@ ask_user_for_config() {
   local config_ok="n"
   local update_ok="y"
 
-  echo ""
+  echo "Hostname is $hostname"
 
   while [[ "$config_ok" == "n" ]]
   do
