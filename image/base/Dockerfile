@@ -122,7 +122,7 @@ RUN   rm -fr /usr/share/man &&\
 
 
 # this can probably be done, but I worry that people changing PG locales will have issues
-# cd /usr/share/locale && rm -fr `ls -d */ | grep -v en`
+RUN cd /usr/share/locale && rm -fr `ls -d */ | grep -v en`
 
 RUN mkdir -p /etc/runit/3.d
 
