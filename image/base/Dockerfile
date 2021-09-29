@@ -122,7 +122,7 @@ RUN   rm -fr /usr/share/man &&\
 
 
 # this can probably be done, but I worry that people changing PG locales will have issues
-RUN cd /usr/share/locale && rm -fr `ls -d */ | grep -v en`
+#RUN cd /usr/share/locale && rm -fr `ls -d */ | grep -v en`
 
 RUN mkdir -p /etc/runit/3.d
 
@@ -138,36 +138,18 @@ ADD cron /etc/service/cron/run
 ADD rsyslog /etc/service/rsyslog/run
 ADD cron.d_anacron /etc/cron.d/anacron
 
-#COPY bamzooka bamzooka
-#RUN mv bamzooka /var/www/
-RUN useradd bamzooka -s /bin/bash -m -U
-
-#RUN cd /var/www
-COPY bamzooka/ /tmp/bamzooka
-# BUILD APP
-# BUILD APP
-# BUILD APP
-# BUILD APP
-# BUILD APP
-# BUILD APP
-# RUN git clone --depth 1 https://github.com/metadot/metadot-workspace.git /tmp/bamzooka
-
-#/var/www/bamzooka
-
-# Build UI - will be located rails public/client folder
-RUN cd /tmp/bamzooka &&\
-    yarn install &&\
-    yarn build-bamzooka-client
-# RUN   cd /var/www/bamzooka &&\
-    # git remote set-branches --add origin tests-passed &&\
-# UI packages
-# mv rails backend
-RUN mkdir -p /var/www
-RUN mv /tmp/bamzooka/apps/bamzooka-backend /var/www/bamzooka
-RUN mkdir -p /var/www/bamzooka/log
-RUN chown -R bamzooka:bamzooka /var/www/bamzooka
-RUN       cd /var/www/bamzooka &&\
-##       bundle config set --local deployment 'true' &&\
-##       bundle config set --local without 'test development' &&\
-       sudo -u bamzooka bundle install --deployment --jobs 4 --without test development &&\
-       find /var/www/bamzooka/vendor/bundle -name tmp -type d -exec rm -rf {} +
+# Bamzooka specific bits
+RUN useradd bamzooka -s /bin/bash -m -U &&\
+    mkdir -p /var/www &&\
+    cd /var/www &&\
+    git clone --depth 1 https://github.com/bamzooka/bamzooka.git &&\
+    cd bamzooka &&\
+    git remote set-branches --add origin main &&\
+    chown -R bamzooka:bamzooka /var/www/bamzooka &&\
+    cd /var/www/bamzooka/apps/bamzooka-backend &&\
+    sudo -u bamzooka bundle install --deployment --jobs 4 --without test development &&\
+    cd /var/www/bamzooka &&\
+    sudo -u bamzooka yarn install &&\
+    sudo -u bamzooka yarn cache clean &&\
+    cd /var/www/bamzooka/apps/bamzooka-backend &&\
+    find /var/www/bamzooka/apps/bamzooka-backend/vendor/bundle -name tmp -type d -exec rm -rf {} +
