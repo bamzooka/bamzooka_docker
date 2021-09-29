@@ -1,7 +1,7 @@
 # This template installs MariaDB and all dependencies needed for importing from vanilla.
 
 params:
-  home: /var/www/bamzooka
+  home: /var/www/bamzooka/apps/bamzooka-backend
 
 hooks:
   after_web_config:

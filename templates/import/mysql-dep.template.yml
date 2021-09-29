@@ -1,7 +1,7 @@
 # This template adds the 'mysql2' gem for import scripts depending on it
 
 params:
-  home: /var/www/bamzooka
+  home: /var/www/bamzooka/apps/bamzooka-backend
 
 hooks:
   after_bundle_exec:

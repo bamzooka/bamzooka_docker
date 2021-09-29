@@ -20,5 +20,5 @@ RUBY
 
   system("chmod +x #{bin}")
   system("use_#{v} && gem update --system && gem install bundler --force")
-  system("use_#{v} && cd /var/www/bamzooka && sudo -u bamzooka bundle install --deployment --jobs 4 --without test development")
+  system("use_#{v} && cd /var/www/bamzooka/apps/bamzooka-backend && sudo -u bamzooka bundle install --deployment --jobs 4 --without test development")
 end

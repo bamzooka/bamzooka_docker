@@ -230,7 +230,7 @@ check_email() {
   if [ "$new_value" != "n" ] && [ "$new_value" != "N" ]
   then
     log "Sending mail to $EMAIL. . . "
-    log "$(sudo docker exec -w /var/www/bamzooka -i $app_name rake emails:test[$EMAIL])"
+    log "$(sudo docker exec -w /var/www/bamzooka/apps/bamzooka-backend -i $app_name rake emails:test[$EMAIL])"
   else
     log "Mail test skipped."
   fi
@@ -320,7 +320,7 @@ print_done() {
     if [ $serve == 'Y' ]
     then
         cp $LOG_FILE shared/standalone/log/var-log/$DOCTOR_FILE
-        sudo docker exec -w /var/www/bamzooka -i $app_name cp /var/log/$DOCTOR_FILE  public
+        sudo docker exec -w /var/www/bamzooka/apps/bamzooka-backend -i $app_name cp /var/log/$DOCTOR_FILE  public
         log "The output of this program may be available at http://$BAMZOOKA_HOSTNAME/$DOCTOR_FILE"
         log "You should inspect that file carefully before sharing the URL."
     else

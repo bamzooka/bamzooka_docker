@@ -44,7 +44,7 @@ hooks:
               listen [::]:80;
 
               location ~ /.well-known {
-                root /var/www/bamzooka/public;
+                root /var/www/bamzooka/apps/bamzooka-backend/public;
                 allow all;
               }
             }
@@ -58,7 +58,7 @@ hooks:
           /usr/sbin/nginx -c /etc/nginx/letsencrypt.conf
 
           issue_cert() {
-            LE_WORKING_DIR="${LETSENCRYPT_DIR}" $$ENV_LETSENCRYPT_DIR/acme.sh --issue $2 -d $$ENV_BAMZOOKA_HOSTNAME --keylength $1 -w /var/www/bamzooka/public
+            LE_WORKING_DIR="${LETSENCRYPT_DIR}" $$ENV_LETSENCRYPT_DIR/acme.sh --issue $2 -d $$ENV_BAMZOOKA_HOSTNAME --keylength $1 -w /var/www/bamzooka/apps/bamzooka-backend/public
           }
 
           cert_exists() {
@@ -100,7 +100,7 @@ hooks:
             --reloadcmd "sv reload nginx"
 
           if cert_exists "" || cert_exists "_ecc"; then
-            grep -q 'force_https' "/var/www/bamzooka/config/bamzooka.conf" || echo "force_https = 'true'" >> "/var/www/bamzooka/config/bamzooka.conf"
+            grep -q 'force_https' "/var/www/bamzooka/apps/bamzooka-backend/config/bamzooka.conf" || echo "force_https = 'true'" >> "/var/www/bamzooka/apps/bamzooka-backend/config/bamzooka.conf"
           fi
 
           /usr/sbin/nginx -c /etc/nginx/letsencrypt.conf -s stop

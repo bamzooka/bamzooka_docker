@@ -19,7 +19,7 @@ env:
 params:
   version: master
 
-  home: /var/www/bamzooka
+  home: /var/www/bamzooka/apps/bamzooka-backend
   upload_size: 10m
 
 run:
@@ -27,7 +27,6 @@ run:
   - exec: /usr/local/bin/ruby -e 'if ENV["BAMZOOKA_SMTP_ADDRESS"] == "smtp.example.com"; puts "Aborting! Mail is not configured!"; exit 1; end'
   - exec: /usr/local/bin/ruby -e 'if ENV["BAMZOOKA_HOSTNAME"] == "bamzooka.example.com"; puts "Aborting! Domain is not configured!"; exit 1; end'
   - exec: /usr/local/bin/ruby -e 'if (ENV["BAMZOOKA_CDN_URL"] || "")[0..1] == "//"; puts "Aborting! CDN must have a protocol specified. Once fixed you should rebake your posts now to correct all posts."; exit 1; end'
-  - exec: chown -R bamzooka /home/bamzooka
   # TODO: move to base image (anacron can not be fired up using rc.d)
   - exec: rm -f /etc/cron.d/anacron
   - file:
@@ -43,7 +42,7 @@ run:
      contents: |
         #!/bin/bash
         env > ~/boot_env
-        conf=/var/www/bamzooka/config/bamzooka.conf
+        conf=/var/www/bamzooka/apps/bamzooka-backend/config/bamzooka.conf
 
         # find BAMZOOKA_ env vars, strip the leader, lowercase the key
         /usr/local/bin/ruby -e 'ENV.each{|k,v| puts "#{$1.downcase} = '\''#{v}'\''" if k =~ /^BAMZOOKA_(.*)/}' > $conf
@@ -169,7 +168,7 @@ run:
      chmod: +x
      contents: |
        #!/bin/bash
-       (cd /var/www/bamzooka && RAILS_ENV=production sudo -H -E -u bamzooka bundle exec script/bamzooka "$@")
+       (cd /var/www/bamzooka/apps/bamzooka-backend && RAILS_ENV=production sudo -H -E -u bamzooka bundle exec script/bamzooka "$@")
 
   - file:
      path: /usr/local/bin/rails
@@ -179,9 +178,9 @@ run:
        # If they requested a console, load pry instead
        if [ "$*" == "c" -o "$*" == "console" ]
        then
-        (cd /var/www/bamzooka && RAILS_ENV=production sudo -H -E -u bamzooka bundle exec pry -r ./config/environment)
+        (cd /var/www/bamzooka/apps/bamzooka-backend && RAILS_ENV=production sudo -H -E -u bamzooka bundle exec pry -r ./config/environment)
        else
-        (cd /var/www/bamzooka && RAILS_ENV=production sudo -H -E -u bamzooka bundle exec script/rails "$@")
+        (cd /var/www/bamzooka/apps/bamzooka-backend && RAILS_ENV=production sudo -H -E -u bamzooka bundle exec script/rails "$@")
        fi
 
   - file:
@@ -189,21 +188,21 @@ run:
      chmod: +x
      contents: |
        #!/bin/bash
-       (cd /var/www/bamzooka && RAILS_ENV=production sudo -H -E -u bamzooka bundle exec bin/rake "$@")
+       (cd /var/www/bamzooka/apps/bamzooka-backend && RAILS_ENV=production sudo -H -E -u bamzooka bundle exec bin/rake "$@")
 
   - file:
      path: /usr/local/bin/rbtrace
      chmod: +x
      contents: |
        #!/bin/bash
-       (cd /var/www/bamzooka && RAILS_ENV=production sudo -H -E -u bamzooka bundle exec rbtrace "$@")
+       (cd /var/www/bamzooka/apps/bamzooka-backend && RAILS_ENV=production sudo -H -E -u bamzooka bundle exec rbtrace "$@")
 
   - file:
      path: /usr/local/bin/stackprof
      chmod: +x
      contents: |
        #!/bin/bash
-       (cd /var/www/bamzooka && RAILS_ENV=production sudo -H -E -u bamzooka bundle exec stackprof "$@")
+       (cd /var/www/bamzooka/apps/bamzooka-backend && RAILS_ENV=production sudo -H -E -u bamzooka bundle exec stackprof "$@")
 
   - file:
      path: /etc/update-motd.d/10-web
@@ -287,7 +286,7 @@ run:
       chmod: +x
       contents: |
         #!/bin/bash
-        /bin/rm -f /var/www/bamzooka/tmp/pids/*.pid
+        /bin/rm -f /var/www/bamzooka/apps/bamzooka-backend/tmp/pids/*.pid
   # change login directory to Bamzooka home
   - file:
      path: /root/.bash_profile
