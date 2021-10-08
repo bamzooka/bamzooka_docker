@@ -93,7 +93,7 @@ hooks:
     - exec:
         cd: $home/plugins
         cmd:
-          - git clone https://github.com/metadot/bamzooka_docker_manager.git
+          - git clone https://github.com/bamzooka/bamzooka_docker_manager.git
 
 ## Remember, this is YAML syntax - you can only have one block with a name
 run:
