@@ -124,16 +124,22 @@ check_IP_match() {
 ##
 ## Do we have docker?
 ##
+
+check_docker() {
+  (which docker || which docker.io) &>/dev/null
+}
+
 check_and_install_docker () {
-  docker_path=`which docker.io || which docker`
-  if [ -z $docker_path ]; then
-    read  -p "Docker not installed. Enter to install from https://get.docker.com/ or Ctrl+C to exit"
+  if ! check_docker; then
+    echo Failed to find docker or docker.io on your PATH.
+    read -p "Enter to install Docker from https://get.docker.com/ or Ctrl+C to exit"
     curl https://get.docker.com/ | sh
-  fi
-  docker_path=`which docker.io || which docker`
-  if [ -z $docker_path ]; then
-    echo Docker install failed. Quitting.
-    exit
+
+    if ! check_docker; then
+      echo Still failed to find docker or docker.io on your PATH.
+      echo Docker install failed. Quitting.
+      exit
+    fi
   fi
 }
 
@@ -369,7 +375,6 @@ EOF
   fi
 }
 
-
 assert_notification_email() {
   if  ! grep BAMZOOKA_NOTIFICATION_EMAIL $web_file >/dev/null 2>&1
   then
@@ -396,12 +401,24 @@ EOF
 ## prompt user for typical Bamzooka config file values
 ##
 ask_user_for_config() {
-
   # NOTE: Defaults now come from standalone.yml
-
   read_config "BAMZOOKA_HOSTNAME"
   hostname=$read_config_result
   local changelog=/tmp/changelog.$PPID
+  read_config "BAMZOOKA_DB_HOST"
+  local db_host=$read_config_result
+  read_config "BAMZOOKA_DB_USERNAME"
+  local db_username=$read_config_result
+  read_config "BAMZOOKA_DB_NAME"
+  local db_name=$read_config_result
+  read_config "BAMZOOKA_DB_PORT"
+  local db_port=$read_config_result
+  read_config "BAMZOOKA_DB_PASSWORD"
+  local db_password=$read_config_result
+  if [ "$db_password" = "pa$$word" ]
+  then
+    db_password = ""
+  fi
   read_config "BAMZOOKA_SMTP_ADDRESS"
   local smtp_address=$read_config_result
   # NOTE: if there are spaces between emails, this breaks, but a human should be paying attention
@@ -494,6 +511,59 @@ ask_user_for_config() {
         fi
       done
     fi
+
+    # Database settings if not inside docker
+    is_db_external=false
+    read -p "Do you want Bamzooka docker to host database inside docker ? [Y/N]" -n 1 -r
+    echo    # (optional) move to a new line
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        is_db_external=true
+    fi
+    if [ "$is_db_external" = true ]
+    then
+      if [ ! -z "$db_host" ]
+      then
+        read -p "database host? [$db_host]: " new_value
+        if [ ! -z "$new_value" ]
+        then
+          db_host="$new_value"
+        fi
+      fi
+      if [ ! -z "$db_username" ]
+      then
+        read -p "database username? [$db_username]: " new_value
+        if [ ! -z "$new_value" ]
+        then
+          db_username="$new_value"
+        fi
+      fi
+      if [ ! -z "$db_name" ]
+      then
+        read -p "database name? [$db_name]: " new_value
+        if [ ! -z "$new_value" ]
+        then
+          db_name="$new_value"
+        fi
+      fi
+      if [ ! -z "$db_port" ]
+      then
+        read -p "database port? [$db_port]: " new_value
+        if [ ! -z "$new_value" ]
+        then
+          db_port="$new_value"
+        fi
+      fi
+      if [ ! -z "$db_password" ]
+      then
+        read -p "database password? [$db_password]: " new_value
+        if [ ! -z "$new_value" ]
+        then
+          db_password="$new_value"
+        fi
+      fi
+    fi
+    # End of database questions
 
     if [ ! -z "$smtp_address" ]
     then
@@ -605,6 +675,16 @@ ask_user_for_config() {
       echo "Maxmind license: (unset)"
     fi
 
+
+    if [ "$is_db_external" = true ]
+    then
+      echo "DB Host     : $db_host"
+      echo "DB Username : $db_username"
+      echo "DB Name     : $db_name"
+      echo "DB Port     : $db_port"
+      echo "DB Password : $db_password"
+    fi
+
     echo ""
     read -p "ENTER to continue, 'n' to try again, Ctrl+C to exit: " config_ok
   done
@@ -626,6 +706,89 @@ ask_user_for_config() {
     echo "BAMZOOKA_DEVELOPER_EMAILS change failed."
     update_ok="n"
   fi
+
+  # External db settings
+  if [ "$is_db_external" = true ]
+  then
+    sed -i -e "s/^  BAMZOOKA_DB_HOST:.*/  BAMZOOKA_DB_HOST: $db_host/w $changelog" $web_file
+    if [ -s $changelog ]
+    then
+      rm $changelog
+    else
+      echo "BAMZOOKA_DB_HOST change failed."
+      update_ok="n"
+    fi
+
+    sed -i -e "s/^  BAMZOOKA_DB_USERNAME:.*/  BAMZOOKA_DB_USERNAME: $db_username/w $changelog" $web_file
+    if [ -s $changelog ]
+    then
+      rm $changelog
+    else
+      echo "BAMZOOKA_DB_USERNAME change failed."
+      update_ok="n"
+    fi
+
+    sed -i -e "s/^  BAMZOOKA_DB_NAME:.*/  BAMZOOKA_DB_NAME: $db_name/w $changelog" $web_file
+    if [ -s $changelog ]
+    then
+      rm $changelog
+    else
+      echo "BAMZOOKA_DB_NAME change failed."
+      update_ok="n"
+    fi
+
+    sed -i -e "s/^  BAMZOOKA_DB_PORT:.*/  BAMZOOKA_DB_PORT: $db_port/w $changelog" $web_file
+    if [ -s $changelog ]
+    then
+      rm $changelog
+    else
+      echo "BAMZOOKA_DB_PORT change failed."
+      update_ok="n"
+    fi
+
+    if [[ "$db_password" == *"\""* ]]
+    then
+      SLASH="BROKEN"
+      echo "========================================"
+      echo "WARNING!!!"
+      echo "Your password contains a quote (\")"
+      echo "Your DB Password will not be set. You will need to edit app.yml to enter it."
+      echo "========================================"
+      update_ok="n"
+    else
+      SLASH="|"
+      if [[ "$db_password" == *"$SLASH"* ]]
+      then SLASH="+"
+           if [[ "$db_password" == *"$SLASH"* ]]
+           then
+             SLASH="Q"
+             if [[ "$db_password" == *"$SLASH"* ]]
+	     then
+	       SLASH="BROKEN"
+               echo "========================================"
+               echo "WARNING!!!"
+               echo "Your password contains all available delimiters (+, |, and Q). "
+               echo "Your DB Password will not be set. You will need to edit app.yml to enter it."
+               echo "========================================"
+               update_ok="n"
+             fi
+           fi
+      fi
+    fi
+    if [[ "$SLASH" != "BROKEN" ]]
+    then
+      sed -i -e "s${SLASH}^  #\?BAMZOOKA_DB_PASSWORD:.*${SLASH}  BAMZOOKA_DB_PASSWORD: \"${db_password}\"${SLASH}w $changelog" $web_file
+
+      if [ -s $changelog ]
+      then
+        rm $changelog
+      else
+        echo "BAMZOOKA_DB_PASSWORD change failed."
+        update_ok="n"
+      fi
+    fi
+  fi
+  # End of external db settings
 
   sed -i -e "s/^  BAMZOOKA_SMTP_ADDRESS:.*/  BAMZOOKA_SMTP_ADDRESS: $smtp_address/w $changelog" $web_file
   if [ -s $changelog ]
@@ -868,7 +1031,6 @@ then
   # assert_maxmind_license_key
   assert_notification_email
   assert_smtp_domain
-  echo
 else
   if [ "$SKIP_CONNECTION_TEST" != 1 ]
   then

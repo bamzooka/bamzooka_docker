@@ -50,6 +50,13 @@ env:
   ## Required. Bamzooka will not work with a bare IP number.
   BAMZOOKA_HOSTNAME: 'bamzooka.example.com'
 
+  # Needed if configuring external db like AWS RDS
+  BAMZOOKA_DB_HOST: 'dbhost.example.com'
+  BAMZOOKA_DB_USERNAME: 'bamzooka'
+  BAMZOOKA_DB_NAME: 'bamzooka'
+  BAMZOOKA_DB_PORT: 5432
+  BAMZOOKA_DB_PASSWORD: pa$$word
+
   ## Uncomment if you want the container to be started with the same
   ## hostname (-h option) as specified above (default "$hostname-$config")
   #DOCKER_USE_HOSTNAME: true
