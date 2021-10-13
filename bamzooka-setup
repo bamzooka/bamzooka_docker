@@ -354,6 +354,25 @@ read_default() {
   read_default_result=`echo $read_config_result | sed "s/^\([\"']\)\(.*\)\1\$/\2/g"`
 }
 
+
+ask_user_if_wants_external_db() {
+  read -p "Do you want Bamzooka docker to host database inside docker ? [Y/N]" -n 1 -r
+  echo    # (optional) move to a new line
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+      is_db_external=true
+  else
+    # TODO (AL) check if app.yml config already exists and do confirmation
+    # Erase settings from web_file
+    echo "Erasing external database variable"
+    sed -i '/BAMZOOKA_DB_HOST/d' $web_file
+    sed -i '/BAMZOOKA_DB_USERNAME/d' $web_file
+    sed -i '/BAMZOOKA_DB_PORT/d' $web_file
+    sed -i '/BAMZOOKA_DB_NAME/d' $web_file
+    sed -i '/BAMZOOKA_DB_PASSWORD/d' $web_file
+  fi
+}
+
 assert_smtp_domain() {
   if  ! grep BAMZOOKA_SMTP_DOMAIN $web_file >/dev/null 2>&1
   then
@@ -405,20 +424,26 @@ ask_user_for_config() {
   read_config "BAMZOOKA_HOSTNAME"
   hostname=$read_config_result
   local changelog=/tmp/changelog.$PPID
-  read_config "BAMZOOKA_DB_HOST"
-  local db_host=$read_config_result
-  read_config "BAMZOOKA_DB_USERNAME"
-  local db_username=$read_config_result
-  read_config "BAMZOOKA_DB_NAME"
-  local db_name=$read_config_result
-  read_config "BAMZOOKA_DB_PORT"
-  local db_port=$read_config_result
-  read_config "BAMZOOKA_DB_PASSWORD"
-  local db_password=$read_config_result
-  if [ "$db_password" = "pa$$word" ]
+
+  # Database settings if not inside docker
+  if [ "$is_db_external" = true ]
   then
-    db_password = ""
+    read_config "BAMZOOKA_DB_HOST"
+    local db_host=$read_config_result
+    read_config "BAMZOOKA_DB_USERNAME"
+    local db_username=$read_config_result
+    read_config "BAMZOOKA_DB_NAME"
+    local db_name=$read_config_result
+    read_config "BAMZOOKA_DB_PORT"
+    local db_port=$read_config_result
+    read_config "BAMZOOKA_DB_PASSWORD"
+    local db_password=$read_config_result
+    if [ "$db_password" = "pa$$word" ]
+    then
+      db_password = ""
+    fi
   fi
+
   read_config "BAMZOOKA_SMTP_ADDRESS"
   local smtp_address=$read_config_result
   # NOTE: if there are spaces between emails, this breaks, but a human should be paying attention
@@ -512,14 +537,8 @@ ask_user_for_config() {
       done
     fi
 
+
     # Database settings if not inside docker
-    is_db_external=false
-    read -p "Do you want Bamzooka docker to host database inside docker ? [Y/N]" -n 1 -r
-    echo    # (optional) move to a new line
-    if [[ $REPLY =~ ^[Yy]$ ]]
-    then
-        is_db_external=true
-    fi
     if [ "$is_db_external" = true ]
     then
       if [ ! -z "$db_host" ]
@@ -979,11 +998,10 @@ validate_config() {
   fi
 }
 
-
 ##
 ## template file names
 ##
-
+is_db_external=false
 if [ "$TWO_CONTAINER" ] || [ -f containers/web_only.yml ]
 then
   app_name=web_only
@@ -1065,6 +1083,7 @@ else
 fi
 
 scale_ram_and_cpu
+ask_user_if_wants_external_db
 ask_user_for_config
 validate_config
 
