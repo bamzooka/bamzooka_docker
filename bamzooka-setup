@@ -360,8 +360,6 @@ ask_user_if_wants_external_db() {
   echo    # (optional) move to a new line
   if [[ $REPLY =~ ^[Yy]$ ]]
   then
-      is_db_external=true
-  else
     # TODO (AL) check if app.yml config already exists and do confirmation
     # Erase settings from web_file
     echo "Erasing external database variable"
@@ -370,6 +368,8 @@ ask_user_if_wants_external_db() {
     sed -i '/BAMZOOKA_DB_PORT/d' $web_file
     sed -i '/BAMZOOKA_DB_NAME/d' $web_file
     sed -i '/BAMZOOKA_DB_PASSWORD/d' $web_file
+  else
+    is_db_external=true
   fi
 }
 
