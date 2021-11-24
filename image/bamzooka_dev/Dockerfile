@@ -3,8 +3,6 @@
 FROM bamzooka/base:release
 ENV RAILS_ENV development
 
-#LABEL maintainer="Sam Saffron \"https://twitter.com/samsaffron\""
-
 # Install for mailcatcher gem
 RUN apt update && apt install -y libsqlite3-dev \
     && gem install mailcatcher && rm -rf /var/lib/apt/lists/*

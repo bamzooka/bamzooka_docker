@@ -1,13 +1,13 @@
-# simple build file to be used locally by Sam
-#
 require 'pty'
 require 'optparse'
 
 images = {
-  base: { name: 'base', tag: "bamzooka/base:build", squash: true },
+  # base: { name: 'base', tag: "bamzooka/base:build", squash: true },
+  base: { name: 'base', tag: "bamzooka/base:build", squash: false },
   bamzooka_test_build: { name: 'bamzooka_test', tag: "bamzooka/bamzooka_test:build", squash: false},
-  bamzooka_test_public: { name: 'bamzooka_test', tag: "bamzooka/bamzooka_test:release", squash: true, extra_args: ' --build-arg tag=release '},
-  bamzooka_dev: { name: 'bamzooka_dev', tag: "bamzooka/bamzooka_dev:build", squash: false },
+  bamzooka_test_public: { name: 'bamzooka_test', tag: "bamzooka/bamzooka_test:release", squash: false, extra_args: ' --build-arg tag=release '},
+  # bamzooka_test_public: { name: 'bamzooka_test', tag: "bamzooka/bamzooka_test:release", squash: true, extra_args: ' --build-arg tag=release '},
+  bamzooka_dev: { name: 'bamzooka_dev', tag: "bamzooka/bamzooka_dev:build", squash: false }
 }
 
 def run(command)
