@@ -428,6 +428,7 @@ ask_user_for_config() {
   # Database settings if not inside docker
   if [ "$is_db_external" = true ]
   then
+    echo "Bamzooka database is external"
     read_config "BAMZOOKA_DB_HOST"
     local db_host=$read_config_result
     read_config "BAMZOOKA_DB_USERNAME"
@@ -442,6 +443,8 @@ ask_user_for_config() {
     then
       db_password = ""
     fi
+  else
+    echo "Bamzooka will be configured to use an internal database."
   fi
 
   read_config "BAMZOOKA_SMTP_ADDRESS"
