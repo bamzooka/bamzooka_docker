@@ -7,8 +7,6 @@ ENV PG_MAJOR 13
 ENV RUBY_ALLOCATOR /usr/lib/libjemalloc.so.1
 ENV RAILS_ENV production
 
-#LABEL maintainer="Daniel Guermeur \"https://twitter.com/supercobra\""
-
 RUN echo 2.0.`date +%Y%m%d` > /VERSION
 
 RUN apt update && apt install -y gnupg sudo curl

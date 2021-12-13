@@ -94,7 +94,14 @@ config_file=containers/"$config".yml
 cidbootstrap=cids/"$config"_bootstrap.cid
 local_bamzooka=local_bamzooka
 
-image="bamzooka/base:2.0.20211014-0050"
+# -----------------------------------------------------------------
+# This needs to be updated manually for each new release we support
+# This needs to be updated manually for each new release we support
+# This needs to be updated manually for each new release we support
+# This needs to be updated manually for each new release we support
+image="bamzooka/base:2.0.20211213-0056" # <------------------------
+# -----------------------------------------------------------------
+
 docker_path=`which docker.io 2> /dev/null || which docker`
 git_path=`which git`
 
