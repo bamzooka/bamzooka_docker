@@ -154,6 +154,12 @@ run:
 
   - exec:
       cd: $home
+      hook: db_create
+      cmd:
+        - su bamzooka -c 'bundle exec rake db:create'
+
+  - exec:
+      cd: $home
       hook: db_migrate
       cmd:
         - su bamzooka -c 'bundle exec rake db:migrate'
