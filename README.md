@@ -191,6 +191,10 @@ host do not match the IDs in the guest, permissions will mismatch. On clean
 installs you can ensure they are in sync by looking at `/etc/passwd` and
 `/etc/group`, the Bamzooka account will have UID 1000.
 
+### MISC
+
+Bamzooka has its own login to docker hub. Ask a dev from the bamzooka team if you need any access
+
 
 ### Credits
 
