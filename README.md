@@ -193,7 +193,7 @@ installs you can ensure they are in sync by looking at `/etc/passwd` and
 
 ### MISC
 
-Bamzooka has its own login to docker hub. Ask a dev from the bamzooka team if you need any access
+ Bamzooka has its own login to docker hub. Ask a dev from the bamzooka team if you need any access
 
 
 ### Credits
