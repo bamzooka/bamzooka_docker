@@ -99,7 +99,7 @@ local_bamzooka=local_bamzooka
 # This needs to be updated manually for each new release we support
 # This needs to be updated manually for each new release we support
 # This needs to be updated manually for each new release we support
-image="bamzooka/base:2.0.20211217-0051" # <------------------------
+image="bamzooka/base:2.0.20230502-0028" # <------------------------
 # -----------------------------------------------------------------
 
 docker_path=`which docker.io 2> /dev/null || which docker`

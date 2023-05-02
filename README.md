@@ -2,6 +2,8 @@
 
 ### About
 
+
+
 - Docker makes it much easier to deploy [a Bamzooka](https://github.com/bamzooka/bamzooka) on your servers and keep it updated.
 - [Docker](https://docker.com/) is an open source project to pack, ship and run any Linux application in a lighter weight, faster container than a traditional virtual machine.
 - The templates and base image configure Bamzooka with the Bamzooka team's recommended optimal defaults.
